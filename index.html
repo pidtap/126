@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lượt bán đầu ca</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏁</text></svg>">
+</head>
+
+<body>
+    <!-- Login Popup -->
+    <div id="login-popup" class="login-popup-overlay">
+        <div class="login-popup-content">
+            <h2>Đăng Nhập</h2>
+            <p>Vui lòng nhập mật khẩu để truy cập</p>
+            <input type="password" id="login-password" placeholder="Nhập mật khẩu..." />
+            <button id="login-submit-btn" class="cute-btn">Vào Trang</button>
+            <p id="login-error" style="color: red; display: none; margin-top: 10px; font-weight: bold;">Mật khẩu không đúng!</p>
+        </div>
+    </div>
+
+    <!-- Global Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-logo">
+                <div class="logo-icon">🏃‍♂️</div>
+                <div class="logo-text">LƯỢT BÁN ĐẦU CA</div>
+            </div>
+            <div class="header-right">
+                <span class="store-name">TGDĐ Giá Rai</span>
+                <button id="sound-toggle-btn" class="sound-toggle-nav" title="Bật/Tắt Nhạc">🔊</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-wrapper">
+        <!-- Selection Screen -->
+        <div id="selection-screen" class="screen active">
+            <div class="header">
+                <h1>🏆 Lượt bán 🏆</h1>
+                <p>Hãy chọn ít nhất 2 nhân vật để bắt đầu nhé!</p>
+            </div>
+
+            <div id="character-grid" class="character-grid">
+                <!-- Nhân vật được đưa vào thông qua JS -->
+            </div>
+
+            <!-- Mảng Betting (Dự đoán) -->
+            <div class="betting-section" id="betting-section"
+                style="display: none; margin-bottom: 1.5rem; text-align: center;">
+                <p style="font-weight: 700; color: #7b1fa2; margin-bottom: 0.5rem; font-size: 1.2rem;">Ai sẻ bán đầu
+                    tiên 👑</p>
+                <select id="prediction-select" class="cute-select">
+                    <option value="">-- Ai sẽ bán lượt 1? --</option>
+                </select>
+            </div>
+
+            <button id="start-btn" class="cute-btn" disabled>Bắt Đầu Đua!</button>
+        </div>
+
+        <!-- Race Screen -->
+        <div id="race-screen" class="screen">
+            <div class="header">
+                <h1 id="race-title">Chuẩn bị...</h1>
+            </div>
+            <div class="track-container" id="track-container">
+                <div class="finish-line"></div>
+                <!-- Đường đua được đưa vào thông qua JS -->
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result-screen" class="screen">
+            <div class="header">
+                <h1>🎉 Kết Quả Chung Cuộc 🎉</h1>
+                <!-- Kết quả dự đoán -->
+                <div id="prediction-result" class="prediction-result" style="display:none;"></div>
+            </div>
+            <div id="podium" class="podium">
+                <!-- Xếp hạng 1,2,3 qua JS -->
+            </div>
+            <h2 id="leaderboard-title"
+                style="display:none; color: var(--primary); font-size: 1.5rem; margin-bottom: 1rem;">Bảng Xếp Hạng Đầy
+                Đủ</h2>
+            <div id="other-ranks" class="other-ranks"></div>
+
+            <div class="action-buttons" id="action-buttons">
+                <button id="restart-btn" class="cute-btn primary">Đua Lại Nào!</button>
+                <button id="share-btn" class="cute-btn share">📸 Chia Sẻ / Lưu Ảnh</button>
+                <button id="reselect-btn" class="cute-btn secondary">Quay Về Chọn Lại</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3><span style="font-size: 1.8rem; margin-right: 5px;">✨</span> LƯỢT BÁN ĐẦU CA</h3>
+                <p class="desc">Hệ thống chọn lượt bán đầu ca vui nhộn Thế Giới Di Động 472 Phường 1 (Giá Rai).</p>
+                <ul class="contact-list">
+                    <li><span class="icon">📍</span> Số 472 khóm 2, Phường Giá Rai, Tỉnh Cà Mau</li>
+                    <li><span class="icon">⏰</span> 8:00 - 20:30 (Kể cả CN & Lễ)</li>
+                    <li><span class="icon">📞</span> 1900 232 460</li>
+                </ul>
+            </div>
+            <div class="footer-map">
+                <iframe
+                    src="https://maps.google.com/maps?q=TGD%C4%90%20Gi%C3%A1%20Rai,%20B%E1%BA%A1c%20Li%C3%AAu&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 Thế Giới Di Động Giá Rai - Chọn lượt bán - All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Nhạc nền vui nhộn (Link MP3 công khai ổn định) -->
+    <audio id="bg-music" loop preload="auto"
+        src="https://freepd.com/music/Comedy%20and%20Fun/Monkeys%20Spinning%20Monkeys.mp3"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
