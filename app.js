@@ -69,7 +69,6 @@ const otherRanks = document.getElementById('other-ranks');
 const leaderboardTitle = document.getElementById('leaderboard-title');
 const restartBtn = document.getElementById('restart-btn');
 const reselectBtn = document.getElementById('reselect-btn');
-const shareBtn = document.getElementById('share-btn');
 const actionButtons = document.getElementById('action-buttons');
 const predictionSelect = document.getElementById('prediction-select');
 const bettingSection = document.getElementById('betting-section');
@@ -543,54 +542,6 @@ function showResults() {
         if(leaderboardTitle) leaderboardTitle.style.display = 'none';
     }
 }
-
-// Chụp & Chia Sẻ Ảnh Kết Quả
-shareBtn.addEventListener('click', () => {
-    playSound('click');
-    const originalText = shareBtn.innerHTML;
-    shareBtn.innerHTML = '⏳ Đang lưu...';
-    
-    // Tạm ẩn bộ nút điều hướng để ảnh kết quả xuất ra được sạch đẹp
-    actionButtons.style.display = 'none';
-    
-    setTimeout(() => {
-        if (typeof html2canvas === 'function') {
-            html2canvas(document.getElementById('result-screen'), { backgroundColor: '#fce4ec', scale: 2, borderRadius: 20, useCORS: true }).then(canvas => {
-                // Hiện lại bộ nút sau khi capture xong
-                actionButtons.style.display = 'flex';
-                shareBtn.innerHTML = originalText;
-                
-                canvas.toBlob(blob => {
-                    const file = new File([blob], 'ketqua-duanhanvat.png', { type: 'image/png' });
-                    // Kiểm tra Web Share API cho thiết bị hỗ trợ (di động)
-                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                        navigator.share({
-                            files: [file],
-                            title: 'Kết Quả Cuộc Đua',
-                            text: 'Nhìn xem ai vô địch cuộc đua nhân vật này nha! 🏁'
-                        }).catch(err => {
-                            console.log('Share cancel/error:', err);
-                            const link = document.createElement('a');
-                            link.download = 'ketqua-duanhanvat.png';
-                            link.href = canvas.toDataURL('image/png');
-                            link.click();
-                        });
-                    } else {
-                        // Fallback PC / Trình duyệt không có nút Share
-                        const link = document.createElement('a');
-                        link.download = 'ketqua-duanhanvat.png';
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                    }
-                }, 'image/png');
-            }).catch(err => {
-                actionButtons.style.display = 'flex';
-                shareBtn.innerHTML = originalText;
-                console.error('Lỗi screenshot:', err);
-            });
-        }
-    }, 150);
-});
 
 // Nút Điều Hướng Trở Lại
 restartBtn.addEventListener('click', () => {
