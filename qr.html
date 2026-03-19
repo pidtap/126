@@ -43,7 +43,9 @@
             <div class="header-right">
                 <span class="store-name">TGDĐ Giá Rai</span>
                 <div class="desktop-nav">
-                    <!-- Nút Trang chủ đã được gỡ bỏ vì click logo là về trang chủ -->
+                    <button id="goto-qr-btn" class="cute-btn share" style="padding: 0.5rem 1rem; font-size: 1rem; margin: 0; margin-right: 10px; min-width: 45px;" onclick="window.location.href='qr.html'"><span class="btn-icon" style="display:none; margin:0;">📸</span><span class="btn-text">Mã QR</span></button>
+                    <button id="manage-btn" class="cute-btn secondary" style="padding: 0.5rem 1rem; font-size: 1rem; margin: 0; margin-right: 10px; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">⚙️</span><span class="btn-text">Quản lý</span></button>
+                    <button id="sound-toggle-btn" class="sound-toggle-nav" title="Bật/Tắt Nhạc">🔊</button>
                 </div>
                 <!-- Mobile Hamburger -->
                 <button id="hamburger-btn" class="hamburger-btn">☰</button>
@@ -56,7 +58,23 @@
         <div class="mobile-menu-content">
             <button id="close-menu-btn" class="close-menu-btn">✖</button>
             <h2 style="color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; text-align: center;">Menu</h2>
-            <!-- Nút Về Trang chủ đã xóa -->
+            <button id="mobile-qr-btn" class="menu-action-btn" onclick="window.location.href='qr.html'"><span class="btn-icon" style="display:none; margin:0;">📸</span><span class="btn-text">Tạo Mã QR</span></button>
+            <button id="mobile-manage-btn" class="menu-action-btn"><span class="btn-icon" style="display:none; margin:0;">⚙️</span><span class="btn-text">Quản lý nhân vật</span></button>
+            <button id="mobile-sound-btn" class="menu-action-btn"><span class="btn-icon" style="display:none; margin:0;">🔊</span><span class="btn-text">Bật/Tắt Nhạc</span></button>
+        </div>
+    </div>
+    
+    <!-- Manage Auth Popup -->
+    <div id="manage-auth-popup" class="login-popup-overlay" style="display: none; z-index: 100000;">
+        <div class="login-popup-content" style="max-width: 450px; padding: 2rem;">
+            <h2>Quản trị viên</h2>
+            <p>Nhập pass quản trị để tiếp tục</p>
+            <input type="password" id="manage-password" placeholder="Mật khẩu..." style="width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #ce93d8; margin-top: 5px; font-size: 1.1rem; text-align: center;" />
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button id="manage-auth-submit-btn" class="cute-btn" style="min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✔️</span><span class="btn-text">Xác nhận</span></button>
+                <button id="manage-auth-cancel-btn" class="cute-btn secondary" style="min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✖️</span><span class="btn-text">Hủy</span></button>
+            </div>
+            <p id="manage-auth-error" style="color: red; display: none; margin-top: 10px; font-weight: bold;">Mật khẩu không đúng!</p>
         </div>
     </div>
 
@@ -104,6 +122,7 @@
     </footer>
 
     <!-- JS QRCode Library -->
+    <audio id="bg-music" loop preload="auto" src="https://freepd.com/music/Comedy%20and%20Fun/Monkeys%20Spinning%20Monkeys.mp3"></audio>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <!-- JS Logic -->
@@ -193,6 +212,64 @@
                 mobileMenu.classList.remove('open');
             }
         });
+
+        // Khối quản lý Đăng Nhập
+        const manageBtn = document.getElementById('manage-btn');
+        const mobileManageBtn = document.getElementById('mobile-manage-btn');
+        const manageAuthPopup = document.getElementById('manage-auth-popup');
+        const managePassword = document.getElementById('manage-password');
+        const manageAuthSubmit = document.getElementById('manage-auth-submit-btn');
+        const manageAuthCancel = document.getElementById('manage-auth-cancel-btn');
+        const manageAuthError = document.getElementById('manage-auth-error');
+
+        function openManageAuth() {
+            mobileMenu.classList.remove('open');
+            manageAuthPopup.style.display = 'flex';
+            managePassword.value = '';
+            manageAuthError.style.display = 'none';
+        }
+        if(manageBtn) manageBtn.addEventListener('click', openManageAuth);
+        if(mobileManageBtn) mobileManageBtn.addEventListener('click', openManageAuth);
+
+        function checkManageAuth() {
+            if (managePassword.value === '1710') {
+                manageAuthPopup.style.display = 'none';
+                sessionStorage.setItem('admin', '1710');
+                window.location.href = 'manager.html';
+            } else {
+                manageAuthError.style.display = 'block';
+            }
+        }
+
+        if(manageAuthSubmit) manageAuthSubmit.addEventListener('click', checkManageAuth);
+        if(manageAuthCancel) manageAuthCancel.addEventListener('click', () => { manageAuthPopup.style.display = 'none'; });
+        if(managePassword) managePassword.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkManageAuth(); });
+
+        // Khối Quản lý Âm Nhạc
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const bgMusic = document.getElementById('bg-music');
+        bgMusic.volume = 0.3;
+        let isSoundEnabled = true; 
+        const toggleBtn = document.getElementById('sound-toggle-btn');
+        const mobileSoundBtn = document.getElementById('mobile-sound-btn');
+
+        function toggleSound() {
+             isSoundEnabled = !isSoundEnabled;
+             const icon = isSoundEnabled ? '🔊' : '🔇';
+             if(toggleBtn) toggleBtn.innerHTML = icon;
+             if(mobileSoundBtn) {
+                 const btnIcon = mobileSoundBtn.querySelector('.btn-icon');
+                 if(btnIcon) btnIcon.innerText = icon;
+             }
+             if(isSoundEnabled) {
+                 if (audioCtx.state === 'suspended') audioCtx.resume();
+                 bgMusic.play().catch(e => console.log("BGM error:", e));
+             } else {
+                 bgMusic.pause();
+             }
+        }
+        if(toggleBtn) toggleBtn.addEventListener('click', toggleSound);
+        if(mobileSoundBtn) mobileSoundBtn.addEventListener('click', toggleSound);
     </script>
 </body>
 </html>

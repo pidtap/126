@@ -293,13 +293,10 @@ addCharBtn.addEventListener('click', async () => {
     }
 });
 
-// Navigation
-function returnHome() {
-    sessionStorage.removeItem('admin');
-    window.location.href = 'index.html';
-}
-if(closeHeaderBtn) closeHeaderBtn.addEventListener('click', returnHome);
-if(mobileManageBtn) mobileManageBtn.addEventListener('click', returnHome);
+// Navigation & Buttons Same as Index
+const manageBtn = document.getElementById('manage-btn');
+if(manageBtn) manageBtn.addEventListener('click', () => { window.location.href = 'manager.html'; });
+if(mobileManageBtn) mobileManageBtn.addEventListener('click', () => { window.location.href = 'manager.html'; });
 
 // Khởi chạy
 loadCharacters();
