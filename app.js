@@ -43,16 +43,26 @@ function playSound(type) {
 
 // Nút Bật/Tắt Âm Thanh + Nhạc Nền
 const toggleBtn = document.getElementById('sound-toggle-btn');
-toggleBtn.addEventListener('click', () => {
+const mobileSoundBtn = document.getElementById('mobile-sound-btn');
+
+function toggleSound() {
      isSoundEnabled = !isSoundEnabled;
-     toggleBtn.innerHTML = isSoundEnabled ? '🔊' : '🔇';
+     const icon = isSoundEnabled ? '🔊' : '🔇';
+     if(toggleBtn) toggleBtn.innerHTML = icon;
+     if(mobileSoundBtn) {
+         const btnIcon = mobileSoundBtn.querySelector('.btn-icon');
+         if(btnIcon) btnIcon.innerText = icon;
+     }
      if(isSoundEnabled) {
          if (audioCtx.state === 'suspended') audioCtx.resume();
          bgMusic.play().catch(e => console.log("BGM error:", e));
      } else {
          bgMusic.pause();
      }
-});
+}
+
+if(toggleBtn) toggleBtn.addEventListener('click', toggleSound);
+if(mobileSoundBtn) mobileSoundBtn.addEventListener('click', toggleSound);
 
 // Các phần tử DOM
 const screens = {
@@ -475,10 +485,10 @@ function showResults() {
     // ----------------
     // CHẤM ĐIỂM TIÊN TRI
     // ----------------
-    const predictedId = parseInt(predictionSelect.value);
+    const predictedId = predictionSelect.value;
     if (predictedId) {
         predictionResultNode.style.display = 'block';
-        if (finishOrder[0].id === predictedId) {
+        if (finishOrder[0].id.toString() === predictedId.toString()) {
             predictionResultNode.innerHTML = '🎯 Chúc mừng! Bạn dự đoán chính xác nhà vô địch!';
             predictionResultNode.className = 'prediction-result predict-success';
             setTimeout(() => playSound('cheer'), 800);
@@ -556,8 +566,172 @@ reselectBtn.addEventListener('click', () => {
     showScreen('selection');
 });
 
+// Cấu hình Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAEqZMUIrnneG0Na-X9KJkiyDjH2nBuHJA",
+  authDomain: "stt126.firebaseapp.com",
+  projectId: "stt126",
+  storageBucket: "stt126.firebasestorage.app",
+  messagingSenderId: "153281554076",
+  appId: "1:153281554076:web:6199aac24bae6bdc096f59",
+  measurementId: "G-5JPHZ09L4N"
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+const db = firebase.firestore();
+
+let characterData = [];
+const DEFAULT_CHARACTERS = [
+    { id: 1, name: 'Phát', image: 'https://ui-avatars.com/api/?name=Phat&background=ffb3ba&color=fff&size=100' },
+    { id: 2, name: 'Dương', image: 'https://ui-avatars.com/api/?name=Duong&background=ffdfba&color=fff&size=100' },
+    { id: 3, name: 'Diễm', image: 'https://ui-avatars.com/api/?name=Diem&background=ffffba&color=fff&size=100' },
+    { id: 4, name: 'Nguyên', image: 'https://ui-avatars.com/api/?name=Nguyen&background=baffc9&color=fff&size=100' },
+    { id: 5, name: 'Vi', image: 'https://ui-avatars.com/api/?name=Vi&background=bae1ff&color=fff&size=100' },
+    { id: 6, name: 'Nhung', image: 'https://ui-avatars.com/api/?name=Nhung&background=e2cbf2&color=fff&size=100' },
+    { id: 7, name: 'Nhân', image: 'https://ui-avatars.com/api/?name=Nhan&background=f2c8cb&color=fff&size=100' },
+];
+
+async function loadCharacters() {
+    try {
+        const snapshot = await db.collection("characters").get();
+        if (snapshot.empty) {
+            console.log("Seeding Database...");
+            for (let char of DEFAULT_CHARACTERS) {
+                await db.collection("characters").doc(char.id.toString()).set(char);
+            }
+            characterData = [...DEFAULT_CHARACTERS];
+        } else {
+            characterData = [];
+            snapshot.forEach(doc => {
+                let data = doc.data();
+                characterData.push(data);
+            });
+            characterData.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // Sắp xếp theo ID
+        }
+    } catch(err) {
+        console.error("Firebase load error. Dùng mảng mặc định.", err);
+        characterData = [...DEFAULT_CHARACTERS];
+    }
+    
+    // Auto remove selectedIds that no longer exist
+    let currentIdsStr = characterData.map(c => c.id.toString());
+    selectedIds.forEach(val => {
+        if (!currentIdsStr.includes(val.toString())) {
+            selectedIds.delete(val);
+        }
+    });
+
+    initSelection();
+}
+
+// --- Logic Màn Hình Quản Lý ---
+const manageBtn = document.getElementById('manage-btn');
+const manageAuthPopup = document.getElementById('manage-auth-popup');
+const managePassword = document.getElementById('manage-password');
+const manageAuthSubmit = document.getElementById('manage-auth-submit-btn');
+const manageAuthCancel = document.getElementById('manage-auth-cancel-btn');
+const manageAuthError = document.getElementById('manage-auth-error');
+
+const managerModal = document.getElementById('manager-modal');
+const closeManagerBtn = document.getElementById('close-manager-btn');
+const managerCharList = document.getElementById('manager-char-list');
+const addCharBtn = document.getElementById('add-char-btn');
+const newCharName = document.getElementById('new-char-name');
+const newCharImage = document.getElementById('new-char-image');
+
+// --- Custom Dialog UI Helpers ---
+window.customAlert = function(message) {
+    return new Promise((resolve) => {
+        document.getElementById('dialog-title').innerText = "Thông báo";
+        document.getElementById('dialog-message').innerText = message;
+        document.getElementById('dialog-cancel-btn').style.display = 'none';
+        
+        const overlay = document.getElementById('custom-dialog-overlay');
+        overlay.style.display = 'flex';
+        
+        const confirmBtn = document.getElementById('dialog-confirm-btn');
+        confirmBtn.onclick = () => {
+            overlay.style.display = 'none';
+            resolve(true);
+        };
+    });
+};
+
+window.customConfirm = function(message) {
+    return new Promise((resolve) => {
+        document.getElementById('dialog-title').innerText = "Xác nhận";
+        document.getElementById('dialog-message').innerText = message;
+        document.getElementById('dialog-cancel-btn').style.display = 'inline-block';
+        
+        const overlay = document.getElementById('custom-dialog-overlay');
+        overlay.style.display = 'flex';
+        
+        const confirmBtn = document.getElementById('dialog-confirm-btn');
+        const cancelBtn = document.getElementById('dialog-cancel-btn');
+        
+        confirmBtn.onclick = () => {
+            overlay.style.display = 'none';
+            resolve(true);
+        };
+        cancelBtn.onclick = () => {
+            overlay.style.display = 'none';
+            resolve(false);
+        };
+    });
+};
+
+// Hamburger Menu Logic
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+const closeMenuBtn = document.getElementById('close-menu-btn');
+const mobileManageBtn = document.getElementById('mobile-manage-btn');
+
+if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', () => {
+        mobileMenu.classList.add('open');
+    });
+}
+if (closeMenuBtn) {
+    closeMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+    });
+}
+
+function openManageAuth() {
+    if(mobileMenu) mobileMenu.classList.remove('open');
+    manageAuthPopup.style.display = 'flex';
+    managePassword.value = '';
+    manageAuthError.style.display = 'none';
+}
+
+if (manageBtn) manageBtn.addEventListener('click', openManageAuth);
+if (mobileManageBtn) mobileManageBtn.addEventListener('click', openManageAuth);
+
+function checkManageAuth() {
+    if (managePassword.value === '1710') {
+        manageAuthPopup.style.display = 'none';
+        sessionStorage.setItem('admin', '1710');
+        window.location.href = 'manager.html';
+    } else {
+        manageAuthError.style.display = 'block';
+    }
+}
+
+if (manageAuthSubmit) {
+    manageAuthSubmit.addEventListener('click', checkManageAuth);
+    manageAuthCancel.addEventListener('click', () => {
+        manageAuthPopup.style.display = 'none';
+    });
+    managePassword.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkManageAuth();
+    });
+}
+
 // Kích hoạt giao diện
-initSelection();
+loadCharacters();
 
 // --- Logic Popup Đăng Nhập ---
 const loginPopup = document.getElementById('login-popup');
@@ -578,12 +752,16 @@ function checkLogin() {
     if (loginPassword.value === pass1 || loginPassword.value === pass2) {
         loginPopup.style.display = 'none';
         document.body.style.overflow = 'auto'; // Cho phép cuộn lại
+        sessionStorage.setItem('race_logged_in', 'true');
     } else {
         loginError.style.display = 'block';
     }
 }
 
-if (loginSubmitBtn && loginPassword) {
+if (sessionStorage.getItem('race_logged_in') === 'true') {
+    if(loginPopup) loginPopup.style.display = 'none';
+    document.body.style.overflow = 'auto';
+} else if (loginSubmitBtn && loginPassword) {
     document.body.style.overflow = 'hidden'; // Khóa cuộn ban đầu
     loginSubmitBtn.addEventListener('click', checkLogin);
     loginPassword.addEventListener('keypress', (e) => {

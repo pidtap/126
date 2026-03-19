@@ -14,12 +14,67 @@
 <body>
     <!-- Login Popup -->
     <div id="login-popup" class="login-popup-overlay">
-        <div class="login-popup-content">
+        <div class="login-popup-content" style="max-width: 450px; padding: 2rem;">
             <h2>Đăng Nhập</h2>
             <p>Vui lòng nhập mật khẩu để truy cập</p>
             <input type="password" id="login-password" placeholder="Nhập mật khẩu..." />
-            <button id="login-submit-btn" class="cute-btn">Vào Trang</button>
+            <button id="login-submit-btn" class="cute-btn" style="margin-top: 15px; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">🔓</span><span class="btn-text">Xác nhận</span></button>
             <p id="login-error" style="color: red; display: none; margin-top: 10px; font-weight: bold;">Mật khẩu không đúng!</p>
+        </div>
+    </div>
+
+    <!-- Manage Auth Popup -->
+    <div id="manage-auth-popup" class="login-popup-overlay" style="display: none;">
+        <div class="login-popup-content" style="max-width: 450px; padding: 2rem;">
+            <h2>Quản trị viên</h2>
+            <p>Nhập pass quản trị để tiếp tục</p>
+            <input type="password" id="manage-password" placeholder="Mật khẩu..." />
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button id="manage-auth-submit-btn" class="cute-btn" style="min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✔️</span><span class="btn-text">Xác nhận</span></button>
+                <button id="manage-auth-cancel-btn" class="cute-btn secondary" style="min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✖️</span><span class="btn-text">Hủy</span></button>
+            </div>
+            <p id="manage-auth-error" style="color: red; display: none; margin-top: 10px; font-weight: bold;">Mật khẩu không đúng!</p>
+        </div>
+    </div>
+
+    <!-- Mobile MenuOverlay -->
+    <div id="mobile-menu" class="mobile-menu-overlay">
+        <div class="mobile-menu-content">
+            <button id="close-menu-btn" class="close-menu-btn">✖</button>
+            <h2 style="color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; text-align: center;">Menu</h2>
+            <button id="mobile-manage-btn" class="menu-action-btn"><span class="btn-icon" style="display:none; margin:0;">⚙️</span><span class="btn-text">Quản lý nhân vật</span></button>
+            <button id="mobile-sound-btn" class="menu-action-btn"><span class="btn-icon" style="display:none; margin:0;">🔊</span><span class="btn-text">Bật/Tắt Nhạc</span></button>
+        </div>
+    </div>
+
+    <!-- Custom Dialog Modal -->
+    <div id="custom-dialog-overlay" class="login-popup-overlay" style="display: none; z-index: 100000;">
+        <div class="login-popup-content" style="max-width: 450px; padding: 2rem;">
+            <h3 id="dialog-title" style="color: var(--primary); margin-bottom: 15px;">Thông báo</h3>
+            <p id="dialog-message" style="margin-bottom: 25px; font-weight: 600; font-size: 1.1rem;"></p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="dialog-confirm-btn" class="cute-btn" style="padding: 0.8rem 1.5rem; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✔️</span><span class="btn-text">OK</span></button>
+                <button id="dialog-cancel-btn" class="cute-btn secondary" style="padding: 0.8rem 1.5rem; display: none; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✖️</span><span class="btn-text">Hủy</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Character Modal -->
+    <div id="edit-char-modal" class="login-popup-overlay" style="display: none; z-index: 99999;">
+        <div class="login-popup-content" style="max-width: 400px; text-align: left;">
+            <h3 style="color: var(--primary); margin-bottom: 15px; text-align: center;">Sửa nhân vật</h3>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold; color: #6a1b9a;">Tên nhân vật:</label>
+                <input type="text" id="edit-char-name" placeholder="Tên nhân vật" style="width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #ce93d8; margin-top: 5px;" />
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: bold; color: #6a1b9a;">URL Hình ảnh:</label>
+                <input type="text" id="edit-char-image" placeholder="Link ảnh..." style="width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #ce93d8; margin-top: 5px;" />
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="edit-char-save-btn" class="cute-btn" style="width: 50%;">Lưu</button>
+                <button id="edit-char-cancel-btn" class="cute-btn secondary" style="width: 50%;">Hủy</button>
+            </div>
         </div>
     </div>
 
@@ -32,7 +87,12 @@
             </div>
             <div class="header-right">
                 <span class="store-name">TGDĐ Giá Rai</span>
-                <button id="sound-toggle-btn" class="sound-toggle-nav" title="Bật/Tắt Nhạc">🔊</button>
+                <div class="desktop-nav">
+                    <button id="manage-btn" class="cute-btn secondary" style="padding: 0.5rem 1rem; font-size: 1rem; margin: 0; margin-right: 10px; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">⚙️</span><span class="btn-text">Quản lý</span></button>
+                    <button id="sound-toggle-btn" class="sound-toggle-nav" title="Bật/Tắt Nhạc">🔊</button>
+                </div>
+                <!-- Mobile Hamburger -->
+                <button id="hamburger-btn" class="hamburger-btn">☰</button>
             </div>
         </div>
     </header>
@@ -52,14 +112,13 @@
             <!-- Mảng Betting (Dự đoán) -->
             <div class="betting-section" id="betting-section"
                 style="display: none; margin-bottom: 1.5rem; text-align: center;">
-                <p style="font-weight: 700; color: #7b1fa2; margin-bottom: 0.5rem; font-size: 1.2rem;">Ai sẻ bán đầu
-                    tiên 👑</p>
+                <p style="font-weight: 700; color: #7b1fa2; margin-bottom: 0.5rem; font-size: 1.2rem;">-- Đoán ai sẽ bán lượt 1? --</p>
                 <select id="prediction-select" class="cute-select">
-                    <option value="">-- Ai sẽ bán lượt 1? --</option>
+                    <option value="">-- Đoán ai sẽ bán lượt 1? --</option>
                 </select>
             </div>
 
-            <button id="start-btn" class="cute-btn" disabled>Bắt Đầu Đua!</button>
+            <button id="start-btn" class="cute-btn primary-btn btn-animate" disabled><span class="btn-text">Đua Thôi </span><span class="btn-icon">🏁</span></button>
         </div>
 
         <!-- Race Screen -->
@@ -87,10 +146,10 @@
                 style="display:none; color: var(--primary); font-size: 1.5rem; margin-bottom: 1rem;">Bảng Xếp Hạng Đầy
                 Đủ</h2>
             <div id="other-ranks" class="other-ranks"></div>
-
-            <div class="action-buttons" id="action-buttons">
-                <button id="restart-btn" class="cute-btn primary">Đua Lại Nào!</button>
-                <button id="reselect-btn" class="cute-btn secondary">Quay Về Chọn Lại</button>
+        
+            <div id="action-buttons" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button id="restart-btn" class="cute-btn"><span class="btn-icon" style="display:none; margin:0;">↺ </span><span class="btn-text">Đua Lại</span></button>
+                <button id="reselect-btn" class="cute-btn secondary"><span class="btn-icon" style="display:none; margin:0;">⇋ </span><span class="btn-text">Đổi Team</span></button>
             </div>
         </div>
     </main>
@@ -109,7 +168,7 @@
             <div class="footer-map">
                 <iframe
                     src="https://maps.google.com/maps?q=TGD%C4%90%20Gi%C3%A1%20Rai,%20B%E1%BA%A1c%20Li%C3%AAu&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                    width="100%" height="150" style="border:0;" allowfullscreen="" loading="lazy"
+                    style="border:0; width: 100%; height: 100%; min-height: 220px;" allowfullscreen="" loading="lazy"
                     referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
@@ -123,7 +182,8 @@
         src="https://freepd.com/music/Comedy%20and%20Fun/Monkeys%20Spinning%20Monkeys.mp3"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="data.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     <script src="app.js"></script>
 </body>
 

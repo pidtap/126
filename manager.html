@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Lượt Bán Đầu Ca</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏁</text></svg>">
+</head>
+
+<body>
+    <!-- Global Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-logo">
+                <div class="logo-icon">🏃‍♂️</div>
+                <div class="logo-text">LƯỢT BÁN ĐẦU CA</div>
+            </div>
+            <div class="header-right">
+                <span class="store-name">TGDĐ Giá Rai</span>
+                <div class="desktop-nav">
+                    <button id="close-manager-header-btn" class="cute-btn secondary" style="padding: 0.5rem 1rem; font-size: 1rem; margin: 0; margin-right: 10px; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">🏠</span><span class="btn-text">Trang chủ</span></button>
+                    <button id="sound-toggle-btn" class="sound-toggle-nav" title="Bật/Tắt Nhạc">🔊</button>
+                </div>
+                <button id="hamburger-btn" class="hamburger-btn">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile MenuOverlay -->
+    <div id="mobile-menu" class="mobile-menu-overlay">
+        <div class="mobile-menu-content">
+            <button id="close-menu-btn" class="close-menu-btn">✖</button>
+            <h2 style="color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; text-align: center;">Menu</h2>
+            <button id="mobile-manage-btn" class="menu-action-btn"><span class="btn-icon" style="display:none; margin:0;">🏠</span><span class="btn-text">Về Trang chủ</span></button>
+            <button id="mobile-sound-btn" class="menu-action-btn"><span class="btn-icon" style="display:none; margin:0;">🔊</span><span class="btn-text">Bật/Tắt Nhạc</span></button>
+        </div>
+    </div>
+
+    <!-- Custom Dialog Modal Cho trang Quản lý -->
+    <div id="custom-dialog-overlay" class="login-popup-overlay" style="display: none; z-index: 100000;">
+        <div class="login-popup-content" style="max-width: 450px; padding: 2rem;">
+            <h3 id="dialog-title" style="color: var(--primary); margin-bottom: 15px;">Thông báo</h3>
+            <p id="dialog-message" style="margin-bottom: 25px; font-weight: 600; font-size: 1.1rem;"></p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="dialog-confirm-btn" class="cute-btn" style="padding: 0.8rem 1.5rem; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✔️</span><span class="btn-text">OK</span></button>
+                <button id="dialog-cancel-btn" class="cute-btn secondary" style="padding: 0.8rem 1.5rem; display: none; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✖️</span><span class="btn-text">Hủy</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Character Modal -->
+    <div id="edit-char-modal" class="login-popup-overlay" style="display: none; z-index: 99999;">
+        <div class="login-popup-content" style="max-width: 500px; text-align: left; padding: 2.5rem 3rem;">
+            <h3 style="color: var(--primary); margin-bottom: 15px; text-align: center; font-size: 1.6rem;">Sửa nhân vật</h3>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold; color: #6a1b9a;">Tên nhân vật:</label>
+                <input type="text" id="edit-char-name" placeholder="Tên nhân vật" style="width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #ce93d8; margin-top: 5px;" />
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: bold; color: #6a1b9a;">URL Hình ảnh:</label>
+                <input type="text" id="edit-char-image" placeholder="Link ảnh..." style="width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #ce93d8; margin-top: 5px;" />
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="edit-char-save-btn" class="cute-btn" style="width: 50%; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">💾</span><span class="btn-text">Lưu</span></button>
+                <button id="edit-char-cancel-btn" class="cute-btn secondary" style="width: 50%; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✖️</span><span class="btn-text">Hủy</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Character Modal -->
+    <div id="add-char-modal" class="login-popup-overlay" style="display: none; z-index: 99999;">
+        <div class="login-popup-content" style="max-width: 500px; text-align: left; padding: 2.5rem 3rem;">
+            <h3 style="color: #6a1b9a; margin-bottom: 15px; text-align: center; font-size: 1.6rem;">Thêm nhân vật mới</h3>
+            <div style="margin-bottom: 15px;">
+                <label style="font-weight: bold; color: #6a1b9a;">Tên nhân vật:</label>
+                <input type="text" id="new-char-name" placeholder="Tên nhân vật" style="width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #ce93d8; margin-top: 5px;" />
+            </div>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: bold; color: #6a1b9a;">URL Hình ảnh:</label>
+                <input type="text" id="new-char-image" placeholder="Link ảnh (Bắt buộc)..." style="width: 100%; padding: 10px; border-radius: 10px; border: 2px solid #ce93d8; margin-top: 5px;" />
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="add-char-btn" class="cute-btn" style="width: 50%; background-color: #ec407a; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">➕</span><span class="btn-text">Thêm mới</span></button>
+                <button id="cancel-add-char-btn" class="cute-btn secondary" style="width: 50%; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">✖️</span><span class="btn-text">Hủy</span></button>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-wrapper" style="display: flex; justify-content: center; padding: 2rem 1rem;">
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 2.5rem 2rem; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 800px; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; width: 100%;">
+                <h2 style="color: #f06292; font-size: 2.2rem; margin: 0; text-shadow: 1px 1px 2px rgba(240,98,146,0.1);">Quản lý</h2>
+                <button id="open-add-modal-btn" class="cute-btn" title="Thêm nhân vật mới" style="padding: 0; width: 50px; height: 50px; margin: 0; background-color: #ec407a; border-radius: 50%; font-size: 2rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(236,64,122,0.3); line-height: 1;">+</button>
+            </div>
+            
+            <div id="manager-char-list" style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+                <!-- List nhân vật load từ JS -->
+            </div>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3><span style="font-size: 1.8rem; margin-right: 5px;">✨</span> LƯỢT BÁN ĐẦU CA</h3>
+                <p class="desc">Chức năng quản trị hệ thống Thế Giới Di Động 472 Phường 1 (Giá Rai).</p>
+                <ul class="contact-list">
+                    <li><span class="icon">📍</span> Số 472 khóm 2, Phường Giá Rai, Tỉnh Cà Mau</li>
+                    <li><span class="icon">📞</span> 1900 232 460</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 Thế Giới Di Động Giá Rai - Chọn lượt bán - All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Nhạc nền vui nhộn -->
+    <audio id="bg-music" loop preload="auto"
+        src="https://freepd.com/music/Comedy%20and%20Fun/Monkeys%20Spinning%20Monkeys.mp3"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="manager.js"></script>
+</body>
+
+</html>
