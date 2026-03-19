@@ -159,7 +159,9 @@ startBtn.addEventListener('click', () => {
     racers = characterData.filter(c => selectedIds.has(c.id)).map((c, i) => ({
         ...c,
         position: 0,
-        speedMultiplier: 0.8 + Math.random() * 0.4, 
+        targetDuration: 8000 + Math.random() * 4000, // Về đích ngẫu nhiên 8 đến 12 giây
+        baseSpeedMulti: 1.0,
+        speedMultiplier: 1.0, 
         finished: false,
         hasEffect: false,
         element: null,
@@ -323,17 +325,50 @@ function startRace() {
                 }, duration);
             }
             
-            // Cập nhật tốc độ nền nếu không dính hiệu ứng (Trung bình luôn là 1.0 để kéo dài cuộc đua sát 10s)
-            if (!racer.ranked) {
-                if (!racer.hasEffect && Math.random() < 0.05) {
-                    racer.speedMultiplier = 0.7 + Math.random() * 0.6;
-                }
+            let moveAmount = 0;
+            if (racer.ranked) {
+                moveAmount = (finishLineThreshold / (10 * FPS)) * 1.5; // Xe trôi nhẹ đỗ bãi
+            } else if (racer.hasEffect) {
+                // Đang chịu hiệu ứng (Mìn, Chuối, Boost, Sét...)
+                moveAmount = (finishLineThreshold / (10 * FPS)) * racer.speedMultiplier;
             } else {
-                racer.speedMultiplier = 1.0; // Xe trôi nhẹ đỗ bãi
+                // Thuật toán Drama: Định hướng chạy theo mục tiêu thời gian đã chọn (8 - 12s)
+                let timeElapsed = (currentTick / FPS) * 1000;
+                let timeRemaining = racer.targetDuration - timeElapsed;
+                
+                // Phong độ chạy thất thường (lên xuống)
+                if (Math.random() < 0.04 || !racer.baseSpeedMulti) {
+                    racer.baseSpeedMulti = 0.2 + Math.random() * 1.6; 
+                }
+
+                let maxPos = Math.max(...racers.map(r => r.position));
+                let minPos = Math.min(...racers.map(r => r.position));
+                let distanceToLeader = maxPos - racer.position;
+
+                // Tình huống: Bét bảng => quyết tâm bứt tốc ngoạn mục
+                if (racer.position === minPos && distanceToLeader > 80 && Math.random() < 0.01) {
+                    racer.baseSpeedMulti = 2.0 + Math.random() * 1.5; 
+                }
+                // Tình huống: Dẫn đầu kiêu ngạo => chạy chậm rì lại chờ thời
+                if (racer.position === maxPos && distanceToLeader > 80 && Math.random() < 0.01) {
+                    racer.baseSpeedMulti = 0.1 + Math.random() * 0.3;
+                }
+
+                let distRem = finishLineThreshold - racer.position;
+                if (distRem < 0) distRem = 0;
+
+                let idealSpeed = 0;
+                // Nếu sắp hết giờ hoặc trễ giờ, bứt tốc cuồng nộ
+                if (timeRemaining <= 500) {
+                    idealSpeed = (finishLineThreshold / (10 * FPS)) * (3.0 + Math.random() * 1.5); 
+                } else {
+                    idealSpeed = distRem / (timeRemaining / 1000 * FPS);
+                }
+                
+                moveAmount = idealSpeed * racer.baseSpeedMulti;
+                if (moveAmount > 25) moveAmount = 25; // Giới hạn tốc độ tránh teleport xuyên map
             }
             
-            // Ép tốc độ trung bình và chuẩn hóa để cuộc đua thực sự diễn ra trong ~10 giây
-            const moveAmount = (finishLineThreshold / ((RACE_DURATION / 1000) * FPS)) * racer.speedMultiplier * (0.8 + Math.random() * 0.4);
             let nextPos = racer.position + moveAmount;
             
             // --- CƠ CHẾ VẬT LÝ RẮN: KHÔNG THỂ XUYÊN QUA NHAU TRONG CÙNG 1 LÀN ---
@@ -413,8 +448,8 @@ function startRace() {
             });
         }
         
-        // Buộc kết thúc hoặc All Finished
-        if (allFinished || currentTick > totalSteps * 1.5) {
+        // Buộc kết thúc hoặc All Finished (Max 14s)
+        if (allFinished || currentTick > (14000 / 1000) * FPS) {
             let remaining = racers.filter(r => !r.ranked);
             remaining.sort((a, b) => b.position - a.position); 
             remaining.forEach(r => {
@@ -609,6 +644,17 @@ async function loadCharacters() {
                 let data = doc.data();
                 characterData.push(data);
             });
+
+            // Tự động dọn rác: Nếu đã có nhân vật thật (ảnh thật), xóa ngay các nhân vật ảo (chữ) cũ
+            const hasRealChars = characterData.some(c => !c.image.includes('ui-avatars.com'));
+            if (hasRealChars) {
+                const fakeChars = characterData.filter(c => c.image.includes('ui-avatars.com'));
+                fakeChars.forEach(fake => {
+                    db.collection("characters").doc(fake.id.toString()).delete().catch(e => console.log(e));
+                });
+                characterData = characterData.filter(c => !c.image.includes('ui-avatars.com'));
+            }
+
             characterData.sort((a, b) => parseInt(a.id) - parseInt(b.id)); // Sắp xếp theo ID
         }
     } catch(err) {
@@ -689,14 +735,28 @@ const mobileMenu = document.getElementById('mobile-menu');
 const closeMenuBtn = document.getElementById('close-menu-btn');
 const mobileManageBtn = document.getElementById('mobile-manage-btn');
 
-if (hamburgerBtn) {
-    hamburgerBtn.addEventListener('click', () => {
-        mobileMenu.classList.add('open');
+if (mobileMenu && hamburgerBtn && closeMenuBtn) {
+    hamburgerBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
+    closeMenuBtn.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    
+    // Đóng khi click vùng tối ngoài khung menu
+    mobileMenu.addEventListener('click', (e) => {
+        if (e.target === mobileMenu) {
+            mobileMenu.classList.remove('open');
+        }
     });
-}
-if (closeMenuBtn) {
-    closeMenuBtn.addEventListener('click', () => {
-        mobileMenu.classList.remove('open');
+
+    // Vuốt ngang sang phải để đóng
+    let touchStartX = 0;
+    let touchEndX = 0;
+    mobileMenu.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    mobileMenu.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchEndX - touchStartX > 50) { 
+            mobileMenu.classList.remove('open');
+        }
     });
 }
 

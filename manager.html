@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản Lý Lượt Bán Đầu Ca</title>
+    <title>Quản Lý</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="icon"
@@ -15,14 +15,14 @@
     <!-- Global Header -->
     <header class="app-header">
         <div class="header-container">
-            <div class="header-logo">
+            <div class="header-logo" style="cursor: pointer;" onclick="window.location.href='index.html'" title="Về Trang Chủ">
                 <div class="logo-icon">🏃‍♂️</div>
                 <div class="logo-text">LƯỢT BÁN ĐẦU CA</div>
             </div>
             <div class="header-right">
                 <span class="store-name">TGDĐ Giá Rai</span>
                 <div class="desktop-nav">
-                    <button id="close-manager-header-btn" class="cute-btn secondary" style="padding: 0.5rem 1rem; font-size: 1rem; margin: 0; margin-right: 10px; min-width: 45px;"><span class="btn-icon" style="display:none; margin:0;">🏠</span><span class="btn-text">Trang chủ</span></button>
+                    <button id="goto-qr-btn" class="cute-btn share" style="padding: 0.5rem 1rem; font-size: 1rem; margin: 0; margin-right: 10px; min-width: 45px;" onclick="window.location.href='qr.html'"><span class="btn-icon" style="display:none; margin:0;">📸</span><span class="btn-text">Mã QR</span></button>
                     <button id="sound-toggle-btn" class="sound-toggle-nav" title="Bật/Tắt Nhạc">🔊</button>
                 </div>
                 <button id="hamburger-btn" class="hamburger-btn">☰</button>
@@ -35,7 +35,7 @@
         <div class="mobile-menu-content">
             <button id="close-menu-btn" class="close-menu-btn">✖</button>
             <h2 style="color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; text-align: center;">Menu</h2>
-            <button id="mobile-manage-btn" class="menu-action-btn"><span class="btn-icon" style="display:none; margin:0;">🏠</span><span class="btn-text">Về Trang chủ</span></button>
+            <button id="mobile-qr-btn" class="menu-action-btn" onclick="window.location.href='qr.html'"><span class="btn-icon" style="display:none; margin:0;">📸</span><span class="btn-text">Tạo Mã QR</span></button>
             <button id="mobile-sound-btn" class="menu-action-btn"><span class="btn-icon" style="display:none; margin:0;">🔊</span><span class="btn-text">Bật/Tắt Nhạc</span></button>
         </div>
     </div>
@@ -107,11 +107,18 @@
         <div class="footer-content">
             <div class="footer-info">
                 <h3><span style="font-size: 1.8rem; margin-right: 5px;">✨</span> LƯỢT BÁN ĐẦU CA</h3>
-                <p class="desc">Chức năng quản trị hệ thống Thế Giới Di Động 472 Phường 1 (Giá Rai).</p>
+                <p class="desc">Hệ thống chọn lượt bán đầu ca vui nhộn Thế Giới Di Động 472 Phường 1 (Giá Rai).</p>
                 <ul class="contact-list">
                     <li><span class="icon">📍</span> Số 472 khóm 2, Phường Giá Rai, Tỉnh Cà Mau</li>
+                    <li><span class="icon">⏰</span> 8:00 - 20:30 (Kể cả CN & Lễ)</li>
                     <li><span class="icon">📞</span> 1900 232 460</li>
                 </ul>
+            </div>
+            <div class="footer-map">
+                <iframe
+                    src="https://maps.google.com/maps?q=TGD%C4%90%20Gi%C3%A1%20Rai,%20B%E1%BA%A1c%20Li%C3%AAu&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    style="border:0; width: 100%; height: 100%; min-height: 220px;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
         <div class="footer-bottom">

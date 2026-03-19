@@ -81,8 +81,28 @@ const mobileMenu = document.getElementById('mobile-menu');
 const closeMenuBtn = document.getElementById('close-menu-btn');
 const mobileManageBtn = document.getElementById('mobile-manage-btn');
 
-hamburgerBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
-closeMenuBtn.addEventListener('click', () => mobileMenu.classList.remove('open'));
+if(mobileMenu && hamburgerBtn && closeMenuBtn) {
+    hamburgerBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
+    closeMenuBtn.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    
+    mobileMenu.addEventListener('click', (e) => {
+        if (e.target === mobileMenu) {
+            mobileMenu.classList.remove('open');
+        }
+    });
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+    mobileMenu.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    mobileMenu.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchEndX - touchStartX > 50) { // Swipe right to close
+            mobileMenu.classList.remove('open');
+        }
+    });
+}
 
 // Load data
 async function loadCharacters() {
@@ -93,6 +113,17 @@ async function loadCharacters() {
         snapshot.forEach(doc => {
             characterData.push(doc.data());
         });
+
+        // Tự động dọn rác avatar ảo khi đã có người dùng nhập avatar thật
+        const hasRealChars = characterData.some(c => !c.image.includes('ui-avatars.com'));
+        if (hasRealChars) {
+            const fakeChars = characterData.filter(c => c.image.includes('ui-avatars.com'));
+            fakeChars.forEach(fake => {
+                db.collection("characters").doc(fake.id.toString()).delete().catch(e => console.log(e));
+            });
+            characterData = characterData.filter(c => !c.image.includes('ui-avatars.com'));
+        }
+
         characterData.sort((a, b) => parseInt(a.id) - parseInt(b.id));
         renderManagerList();
     } catch(err) {

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Mã QR </title>
+    <!-- CSS Tùy chỉnh -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        .qr-output-container {
+            width: 250px; 
+            height: 250px; 
+            background: white; 
+            border-radius: 12px; 
+            border: 2px dashed #f06292; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            margin-bottom: 2rem; 
+            padding: 15px;
+            transition: all 0.3s;
+        }
+        .qr-output-container.has-qr {
+            border: 2px solid transparent;
+        }
+        #qr-output img, #qr-output canvas {
+            margin: auto;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="header-logo" style="cursor: pointer;" onclick="window.location.href='index.html'" title="Về Trang Chủ">
+                <div class="logo-icon">🏃‍♂️</div>
+                <div class="logo-text">QR CODE</div>
+            </div>
+            <div class="header-right">
+                <span class="store-name">TGDĐ Giá Rai</span>
+                <div class="desktop-nav">
+                    <!-- Nút Trang chủ đã được gỡ bỏ vì click logo là về trang chủ -->
+                </div>
+                <!-- Mobile Hamburger -->
+                <button id="hamburger-btn" class="hamburger-btn">☰</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="mobile-menu-overlay">
+        <div class="mobile-menu-content">
+            <button id="close-menu-btn" class="close-menu-btn">✖</button>
+            <h2 style="color: var(--primary); margin-bottom: 20px; font-size: 1.5rem; text-align: center;">Menu</h2>
+            <!-- Nút Về Trang chủ đã xóa -->
+        </div>
+    </div>
+
+    <!-- NỘI DUNG CHÍNH -->
+    <main class="main-wrapper" style="display: flex; justify-content: center; padding: 2rem 1rem; flex-direction: column;">
+        
+        <div style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 2.5rem 2rem; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 600px; display: flex; flex-direction: column; align-items: center; margin-bottom: 30px;">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <h2 style="color: #f06292; font-size: 2.2rem; margin-bottom: 10px; text-shadow: 1px 1px 2px rgba(240,98,146,0.1);">Tạo Mã QR </h2>
+            </div>
+            
+            <input type="text" id="qr-input" placeholder="Nhập văn bản, số điện thoại, link... vào đây nè!" style="width: 100%; padding: 15px; border-radius: 12px; border: 2px solid #ce93d8; font-size: 1.1rem; margin-bottom: 25px; font-family: inherit; outline: none; transition: all 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02);" autocomplete="off" />
+            
+            <div id="qr-output" class="qr-output-container" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                <span id="qr-placeholder" style="color: #bdbdbd; font-weight: 600; text-align: center;">Vùng mã hoá QR<br/>Trống không 🌸</span>
+                <div id="qr-wrapper" style="display: none; margin: 0 auto;"></div>
+            </div>
+            
+            <button id="download-qr-btn" class="cute-btn share" style="display: none; padding: 0.8rem 2rem; width: 80%;"><span class="btn-icon">⬇️</span><span class="btn-text"> Lưu Mã Vào Thư Viện</span></button>
+        </div>
+
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-info">
+                <h3><span style="font-size: 1.8rem; margin-right: 5px;">✨</span> LƯỢT BÁN ĐẦU CA</h3>
+                <p class="desc">Hệ thống chọn lượt bán đầu ca vui nhộn Thế Giới Di Động 472 Phường 1 (Giá Rai).</p>
+                <ul class="contact-list">
+                    <li><span class="icon">📍</span> Số 472 khóm 2, Phường Giá Rai, Tỉnh Cà Mau</li>
+                    <li><span class="icon">⏰</span> 8:00 - 20:30 (Kể cả CN & Lễ)</li>
+                    <li><span class="icon">📞</span> 1900 232 460</li>
+                </ul>
+            </div>
+            <div class="footer-map">
+                <iframe
+                    src="https://maps.google.com/maps?q=TGD%C4%90%20Gi%C3%A1%20Rai,%20B%E1%BA%A1c%20Li%C3%AAu&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                    style="border:0; width: 100%; height: 100%; min-height: 220px;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 Thế Giới Di Động Giá Rai - Chọn lượt bán - All rights reserved.
+        </div>
+    </footer>
+
+    <!-- JS QRCode Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- JS Logic -->
+    <script>
+        const qrInput = document.getElementById('qr-input');
+        const qrOutput = document.getElementById('qr-output');
+        const qrWrapper = document.getElementById('qr-wrapper');
+        const qrPlaceholder = document.getElementById('qr-placeholder');
+        const downloadBtn = document.getElementById('download-qr-btn');
+        let qrcode = null;
+
+        qrInput.addEventListener('input', () => {
+            const text = qrInput.value.trim();
+            if (!text) {
+                qrPlaceholder.style.display = 'block';
+                qrWrapper.style.display = 'none';
+                qrOutput.classList.remove('has-qr');
+                downloadBtn.style.display = 'none';
+                if (qrcode) qrcode.clear();
+                return;
+            }
+            
+            qrPlaceholder.style.display = 'none';
+            qrWrapper.style.display = 'block';
+            qrOutput.classList.add('has-qr');
+            
+            if (!qrcode) {
+                qrcode = new QRCode(qrWrapper, {
+                    text: text,
+                    width: 220,
+                    height: 220,
+                    colorDark : "#4a148c",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            } else {
+                qrcode.clear();
+                qrcode.makeCode(text);
+            }
+            
+            downloadBtn.style.display = 'block';
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const canvas = qrWrapper.querySelector('canvas');
+            const img = qrWrapper.querySelector('img');
+            let imgData = null;
+            
+            if (img && img.src && img.src.startsWith('data:image')) {
+                imgData = img.src;
+            } else if (canvas) {
+                imgData = canvas.toDataURL('image/png');
+            }
+
+            if (imgData) {
+                const a = document.createElement('a');
+                a.href = imgData;
+                a.download = 'TuyetTac_QRCode.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                alert("Mã QR đang được tạo, đợi xíu nha!");
+            }
+        });
+
+        // Navigation Header & Menu
+        
+        const mobileMenu = document.getElementById('mobile-menu');
+        document.getElementById('hamburger-btn').addEventListener('click', () => { mobileMenu.classList.add('open'); });
+        document.getElementById('close-menu-btn').addEventListener('click', () => { mobileMenu.classList.remove('open'); });
+
+        mobileMenu.addEventListener('click', (e) => {
+            if (e.target === mobileMenu) {
+                mobileMenu.classList.remove('open');
+            }
+        });
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+        mobileMenu.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+        mobileMenu.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX - touchStartX > 50) {
+                mobileMenu.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
